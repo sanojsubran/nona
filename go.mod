@@ -1,3 +1,3 @@
-module lpn
+module nona
 
 go 1.25.6
