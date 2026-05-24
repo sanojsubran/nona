@@ -33,7 +33,7 @@ func rename(path string) error {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: lpn <file> [file ...]")
+		fmt.Fprintln(os.Stderr, "usage: nona <file> [file ...]")
 		os.Exit(1)
 	}
 	var failed bool
