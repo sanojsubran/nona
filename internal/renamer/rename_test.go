@@ -9,41 +9,97 @@ import (
 func TestNormalize(t *testing.T) {
 	cases := []struct {
 		input string
+		style Style
 		want  string
 	}{
-		{"hello", "hello"},
-		{"Hello World", "hello-world"},
-		{"foo_bar", "foo-bar"},
-		{"foo-bar", "foo-bar"},
-		{"foo--bar", "foo-bar"},
-		{"foo__bar", "foo-bar"},
-		{"foo - bar", "foo-bar"},
-		{"FOO_BAR_BAZ", "foo-bar-baz"},
-		{"already-normalized", "already-normalized"},
-		{"Screenshot 2024-01-15 at 10.30.45 AM.png", "screenshot-2024-01-15-at-10.30.45-am.png"},
+		// Kebab (default)
+		{"hello", Kebab, "hello"},
+		{"Hello World", Kebab, "hello-world"},
+		{"foo_bar", Kebab, "foo-bar"},
+		{"foo-bar", Kebab, "foo-bar"},
+		{"foo--bar", Kebab, "foo-bar"},
+		{"foo__bar", Kebab, "foo-bar"},
+		{"foo - bar", Kebab, "foo-bar"},
+		{"FOO_BAR_BAZ", Kebab, "foo-bar-baz"},
+		{"already-normalized", Kebab, "already-normalized"},
+		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Kebab, "screenshot-2024-01-15-at-10.30.45-am.png"},
+
+		// Snake
+		{"Hello World", Snake, "hello_world"},
+		{"foo-bar", Snake, "foo_bar"},
+		{"FOO_BAR_BAZ", Snake, "foo_bar_baz"},
+		{"foo - bar", Snake, "foo_bar"},
+		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Snake, "screenshot_2024_01_15_at_10.30.45_am.png"},
+
+		// Camel
+		{"Hello World", Camel, "HelloWorld"},
+		{"foo-bar", Camel, "FooBar"},
+		{"foo_bar_baz", Camel, "FooBarBaz"},
+		{"foo - bar", Camel, "FooBar"},
+		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Camel, "Screenshot20240115At10.30.45Am.png"},
 	}
 
 	for _, c := range cases {
-		got := Normalize(c.input)
+		got := Normalize(c.input, c.style)
 		if got != c.want {
-			t.Errorf("Normalize(%q) = %q, want %q", c.input, got, c.want)
+			t.Errorf("Normalize(%q, %v) = %q, want %q", c.input, c.style, got, c.want)
 		}
 	}
 }
 
 func TestRename(t *testing.T) {
-	t.Run("renames file when name changes", func(t *testing.T) {
+	t.Run("kebab: renames file when name changes", func(t *testing.T) {
 		dir := t.TempDir()
 		src := filepath.Join(dir, "Hello World.txt")
 		if err := os.WriteFile(src, nil, 0644); err != nil {
 			t.Fatal(err)
 		}
 
-		if err := Rename(src); err != nil {
+		if err := Rename(src, Kebab); err != nil {
 			t.Fatalf("Rename returned error: %v", err)
 		}
 
 		dst := filepath.Join(dir, "hello-world.txt")
+		if _, err := os.Stat(dst); err != nil {
+			t.Errorf("expected %q to exist: %v", dst, err)
+		}
+		if _, err := os.Stat(src); !os.IsNotExist(err) {
+			t.Errorf("expected %q to be gone", src)
+		}
+	})
+
+	t.Run("snake: renames file when name changes", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "Hello World.txt")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := Rename(src, Snake); err != nil {
+			t.Fatalf("Rename returned error: %v", err)
+		}
+
+		dst := filepath.Join(dir, "hello_world.txt")
+		if _, err := os.Stat(dst); err != nil {
+			t.Errorf("expected %q to exist: %v", dst, err)
+		}
+		if _, err := os.Stat(src); !os.IsNotExist(err) {
+			t.Errorf("expected %q to be gone", src)
+		}
+	})
+
+	t.Run("camel: renames file when name changes", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "hello world.txt")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := Rename(src, Camel); err != nil {
+			t.Fatalf("Rename returned error: %v", err)
+		}
+
+		dst := filepath.Join(dir, "HelloWorld.txt")
 		if _, err := os.Stat(dst); err != nil {
 			t.Errorf("expected %q to exist: %v", dst, err)
 		}
@@ -59,7 +115,7 @@ func TestRename(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if err := Rename(src); err != nil {
+		if err := Rename(src, Kebab); err != nil {
 			t.Fatalf("Rename returned error: %v", err)
 		}
 
@@ -75,7 +131,7 @@ func TestRename(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if err := Rename(src); err != nil {
+		if err := Rename(src, Kebab); err != nil {
 			t.Fatalf("Rename returned error: %v", err)
 		}
 
@@ -90,7 +146,7 @@ func TestRename(t *testing.T) {
 
 	t.Run("returns error for nonexistent file", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := Rename(filepath.Join(dir, "Nonexistent File.txt")); err == nil {
+		if err := Rename(filepath.Join(dir, "Nonexistent File.txt"), Kebab); err == nil {
 			t.Error("expected error for nonexistent file, got nil")
 		}
 	})
