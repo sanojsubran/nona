@@ -1,4 +1,4 @@
-package main
+package renamer
 
 import (
 	"fmt"
@@ -10,16 +10,16 @@ import (
 
 var separatorRe = regexp.MustCompile(`[ \-_]+`)
 
-func normalize(name string) string {
+func Normalize(name string) string {
 	name = strings.ToLower(name)
 	name = separatorRe.ReplaceAllString(name, "-")
 	return name
 }
 
-func rename(path string) error {
+func Rename(path string) error {
 	dir := filepath.Dir(path)
 	base := filepath.Base(path)
-	newBase := normalize(base)
+	newBase := Normalize(base)
 	if newBase == base {
 		return nil
 	}
@@ -29,21 +29,4 @@ func rename(path string) error {
 	}
 	fmt.Printf("%s -> %s\n", path, newPath)
 	return nil
-}
-
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: nona <file> [file ...]")
-		os.Exit(1)
-	}
-	var failed bool
-	for _, arg := range os.Args[1:] {
-		if err := rename(arg); err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			failed = true
-		}
-	}
-	if failed {
-		os.Exit(1)
-	}
 }
