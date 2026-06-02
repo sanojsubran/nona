@@ -1,0 +1,45 @@
+name: Update Homebrew Formula
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract version
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Compute tarball SHA256
+        id: sha
+        run: |
+          URL="https://github.com/sanojsubran/nona/archive/refs/tags/${{ steps.version.outputs.tag }}.tar.gz"
+          SHA=$(curl -sL "$URL" | sha256sum | awk '{print $1}')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout homebrew-nona
+        uses: actions/checkout@v4
+        with:
+          repository: sanojsubran/homebrew-nona
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+      - name: Update formula
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          URL="${{ steps.sha.outputs.url }}"
+          SHA="${{ steps.sha.outputs.sha256 }}"
+
+          sed -i "s|url \".*\"|url \"$URL\"|" Formula/nona.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$SHA\"|" Formula/nona.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/nona.rb
+          git commit -m "chore: update nona to ${{ steps.version.outputs.tag }}"
+          git push
