@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-var separatorRe = regexp.MustCompile(`[ \-_]+`)
+var separatorRe = regexp.MustCompile(`[ \-_\x{202F}]+`)
 
 func Normalize(name string, style Style) string {
 	ext := filepath.Ext(name)

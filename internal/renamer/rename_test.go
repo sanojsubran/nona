@@ -26,6 +26,7 @@ func TestNormalize(t *testing.T) {
 		{"FOO_BAR_BAZ", Kebab, "foo-bar-baz"},
 		{"already-normalized", Kebab, "already-normalized"},
 		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Kebab, "screenshot-2024-01-15-at-10.30.45-am.png"},
+		{"Screenshot 2026-05-13 at 9.49.37 PM.png", Kebab, "screenshot-2026-05-13-at-9.49.37-pm.png"},
 
 		// Snake
 		{"Hello World", Snake, "hello_world"},
@@ -33,6 +34,7 @@ func TestNormalize(t *testing.T) {
 		{"FOO_BAR_BAZ", Snake, "foo_bar_baz"},
 		{"foo - bar", Snake, "foo_bar"},
 		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Snake, "screenshot_2024_01_15_at_10.30.45_am.png"},
+		{"Screenshot 2026-05-13 at 9.49.37 PM.png", Snake, "screenshot_2026_05_13_at_9.49.37_pm.png"},
 
 		// Camel
 		{"Hello World", Camel, "HelloWorld"},
@@ -40,6 +42,7 @@ func TestNormalize(t *testing.T) {
 		{"foo_bar_baz", Camel, "FooBarBaz"},
 		{"foo - bar", Camel, "FooBar"},
 		{"Screenshot 2024-01-15 at 10.30.45 AM.png", Camel, "Screenshot20240115At10.30.45Am.png"},
+		{"Screenshot 2026-05-13 at 9.49.37 PM.png", Camel, "Screenshot20260513At9.49.37Pm.png"},
 	}
 
 	for _, c := range cases {
