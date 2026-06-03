@@ -8,6 +8,6 @@
   <rect x="40" y="68" width="34" height="8" rx="4" fill="#f59e0b"/>
 
   <!-- wordmark tight -->
-  <text x="96" y="78" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="-4" fill="#0ea5e9">no</text>
-  <text x="152" y="78" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="-4" fill="#f59e0b">na</text>
+  <text x="96" y="78" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="-4" fill="#7c6af7">no</text>
+  <text x="152" y="78" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="-4" fill="#e2e4ef">na</text>
 </svg>
