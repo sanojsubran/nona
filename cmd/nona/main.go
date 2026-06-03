@@ -11,12 +11,28 @@ import (
 	"nona/internal/renamer"
 )
 
+var version = "dev"
+
 func main() {
-	styleFlag := flag.String("style", "kebab", "naming style: kebab, snake, camel")
+	styleFlag := flag.String("style", "kebab", "naming style: kebab, snake, or camel")
+	versionFlag := flag.Bool("version", false, "print version and exit")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: nona [options] <file> [file ...]\n\n")
+		fmt.Fprintf(os.Stderr, "Rename files to a consistent naming style.\n\n")
+		fmt.Fprintf(os.Stderr, "Options:\n")
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
+	if *versionFlag {
+		fmt.Println("nona", version)
+		return
+	}
+
 	if flag.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nona [--style kebab|snake|camel] <file> [file ...]")
+		flag.Usage()
 		os.Exit(1)
 	}
 
