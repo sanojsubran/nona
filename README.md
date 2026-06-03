@@ -1,5 +1,7 @@
 # nona
 
+![nona logo](docs/nona-logo.svg)
+
 `nona` renames files by normalizing their names into a consistent style. Spaces, hyphens, and underscores are treated as word separators and collapsed. The default output style is kebab-case.
 
 ## Usage
