@@ -34,7 +34,7 @@ Files whose names are already normalized are left untouched. Each rename is prin
 ## Install
 
 ```
-brew tap sanojsubran/nona
+brew tap sanojsubran/apps
 brew install nona
 ```
 
