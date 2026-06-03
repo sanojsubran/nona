@@ -21,10 +21,10 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout homebrew-nona
+      - name: Checkout homebrew-apps
         uses: actions/checkout@v4
         with:
-          repository: sanojsubran/homebrew-nona
+          repository: sanojsubran/homebrew-apps
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 
       - name: Update formula
