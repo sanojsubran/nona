@@ -316,7 +316,8 @@
 
     <div class="code-block">
       <div class="code-block-header">shell</div>
-      <pre>nona [--style kebab|snake|camel] &lt;file&gt; [file ...]</pre>
+      <pre>nona [--style kebab|snake|camel] &lt;file&gt; [file ...]
+nona --replace old=new &lt;file&gt; [file ...]</pre>
     </div>
 
     <div class="code-block">
@@ -332,6 +333,11 @@ Hello World.txt <span class="c-arrow">-&gt;</span> <span class="c-result">hello_
 <span class="c-comment"># CamelCase</span>
 <span class="c-prompt">$</span> nona <span class="c-flag">--style camel</span> <span class="c-string">"hello world.txt"</span>
 hello world.txt <span class="c-arrow">-&gt;</span> <span class="c-result">HelloWorld.txt</span>
+
+<span class="c-comment"># Replace substring across files</span>
+<span class="c-prompt">$</span> nona <span class="c-flag">--replace</span> <span class="c-string">dsc=paris</span> *.jpg
+dsc-001.jpg <span class="c-arrow">-&gt;</span> <span class="c-result">paris-001.jpg</span>
+dsc-002.jpg <span class="c-arrow">-&gt;</span> <span class="c-result">paris-002.jpg</span>
 
 <span class="c-comment"># Batch rename</span>
 <span class="c-prompt">$</span> nona *.png</pre>

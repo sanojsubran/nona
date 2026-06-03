@@ -53,6 +53,77 @@ func TestNormalize(t *testing.T) {
 	}
 }
 
+func TestReplaceInName(t *testing.T) {
+	t.Run("replaces substring in stem", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "dsc-001.jpg")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := ReplaceInName(src, "dsc", "paris"); err != nil {
+			t.Fatalf("ReplaceInName returned error: %v", err)
+		}
+		dst := filepath.Join(dir, "paris-001.jpg")
+		if _, err := os.Stat(dst); err != nil {
+			t.Errorf("expected %q to exist: %v", dst, err)
+		}
+		if _, err := os.Stat(src); !os.IsNotExist(err) {
+			t.Errorf("expected %q to be gone", src)
+		}
+	})
+
+	t.Run("replaces all occurrences in stem", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "dsc-dsc-001.jpg")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := ReplaceInName(src, "dsc", "paris"); err != nil {
+			t.Fatalf("ReplaceInName returned error: %v", err)
+		}
+		dst := filepath.Join(dir, "paris-paris-001.jpg")
+		if _, err := os.Stat(dst); err != nil {
+			t.Errorf("expected %q to exist: %v", dst, err)
+		}
+	})
+
+	t.Run("does not touch extension", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "img.jpg")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := ReplaceInName(src, "img", "photo"); err != nil {
+			t.Fatalf("ReplaceInName returned error: %v", err)
+		}
+		dst := filepath.Join(dir, "photo.jpg")
+		if _, err := os.Stat(dst); err != nil {
+			t.Errorf("expected %q to exist: %v", dst, err)
+		}
+	})
+
+	t.Run("no-op when substring not found", func(t *testing.T) {
+		dir := t.TempDir()
+		src := filepath.Join(dir, "dsc-001.jpg")
+		if err := os.WriteFile(src, nil, 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := ReplaceInName(src, "xyz", "abc"); err != nil {
+			t.Fatalf("ReplaceInName returned error: %v", err)
+		}
+		if _, err := os.Stat(src); err != nil {
+			t.Errorf("expected %q to still exist: %v", src, err)
+		}
+	})
+
+	t.Run("returns error for nonexistent file", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := ReplaceInName(filepath.Join(dir, "ghost.jpg"), "dsc", "paris"); err == nil {
+			t.Error("expected error for nonexistent file, got nil")
+		}
+	})
+}
+
 func TestRename(t *testing.T) {
 	t.Run("kebab: renames file when name changes", func(t *testing.T) {
 		dir := t.TempDir()

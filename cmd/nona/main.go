@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"nona/internal/renamer"
 )
@@ -15,11 +16,14 @@ var version = "dev"
 
 func main() {
 	styleFlag := flag.String("style", "kebab", "naming style: kebab, snake, or camel")
+	replaceFlag := flag.String("replace", "", "replace a substring in the filename: `old=new`")
 	versionFlag := flag.Bool("version", false, "print version and exit")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: nona [options] <file> [file ...]\n\n")
-		fmt.Fprintf(os.Stderr, "Rename files to a consistent naming style.\n\n")
+		fmt.Fprintf(os.Stderr, "Usage:\n")
+		fmt.Fprintf(os.Stderr, "  nona [--style kebab|snake|camel] <file> [file ...]\n")
+		fmt.Fprintf(os.Stderr, "  nona --replace old=new <file> [file ...]\n\n")
+		fmt.Fprintf(os.Stderr, "Normalize filenames to a consistent style, or replace a substring across files.\n\n")
 		fmt.Fprintf(os.Stderr, "Options:\n")
 		flag.PrintDefaults()
 	}
@@ -34,6 +38,36 @@ func main() {
 	if flag.NArg() == 0 {
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *replaceFlag != "" {
+		var styleExplicit bool
+		flag.Visit(func(f *flag.Flag) {
+			if f.Name == "style" {
+				styleExplicit = true
+			}
+		})
+		if styleExplicit {
+			fmt.Fprintln(os.Stderr, "error: --replace and --style cannot be used together")
+			os.Exit(1)
+		}
+
+		parts := strings.SplitN(*replaceFlag, "=", 2)
+		if len(parts) != 2 || parts[0] == "" {
+			fmt.Fprintln(os.Stderr, "error: --replace must be in old=new format")
+			os.Exit(1)
+		}
+		var failed bool
+		for _, arg := range flag.Args() {
+			if err := renamer.ReplaceInName(arg, parts[0], parts[1]); err != nil {
+				fmt.Fprintf(os.Stderr, "error: %v\n", err)
+				failed = true
+			}
+		}
+		if failed {
+			os.Exit(1)
+		}
+		return
 	}
 
 	var style renamer.Style
